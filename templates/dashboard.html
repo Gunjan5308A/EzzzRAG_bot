@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - RAG Automation</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  {% include "partials/nav.html" %}
+  <div class="layout">
+    {% include "partials/sidebar.html" %}
+    <main class="main">
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-sub">Welcome back, {{ user.name }}!</p>
+
+      <div class="grid-3" id="stats">
+        <div class="card stat"><div class="stat-icon blue">🤖</div><div><div class="stat-value" id="s-bots">-</div><div class="stat-label">Chatbots</div></div></div>
+        <div class="card stat"><div class="stat-icon green">📄</div><div><div class="stat-value" id="s-docs">-</div><div class="stat-label">Documents</div></div></div>
+        <div class="card stat"><div class="stat-icon purple">💬</div><div><div class="stat-value">0</div><div class="stat-label">Conversations</div></div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2>Recent Chatbots</h2>
+          <a href="/chatbots" class="btn btn-ghost btn-sm">View all</a>
+        </div>
+        <div id="bot-list" class="card-body">Loading...</div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    fetch('/api/chatbots').then(r=>r.json()).then(bots=>{
+      document.getElementById('s-bots').textContent = bots.length;
+      document.getElementById('s-docs').textContent = bots.reduce((s,b)=>s+b.document_count,0);
+      const el = document.getElementById('bot-list');
+      if(!bots.length){ el.innerHTML='<p class="muted">No chatbots yet. <a href="/chatbots/new">Create one</a></p>'; return; }
+      el.innerHTML = bots.slice(0,5).map(b=>`
+        <a href="/chatbots/${b.id}" class="list-item">
+          <div class="list-item-icon" style="background:${b.theme_color}20;color:${b.theme_color}">🤖</div>
+          <div class="list-item-info"><strong>${b.name}</strong><span class="muted">${b.document_count} docs · ${b.context_count} contexts</span></div>
+          <span class="muted">→</span>
+        </a>`).join('');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbots - RAG Automation</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  {% include "partials/nav.html" %}
+  <div class="layout">
+    {% include "partials/sidebar.html" %}
+    <main class="main">
+      <div class="page-header">
+        <div><h1 class="page-title">Chatbots</h1><p class="page-sub">Manage your chatbots</p></div>
+        <a href="/chatbots/new" class="btn btn-primary">+ New Chatbot</a>
+      </div>
+      <div id="bot-list" class="card-body">Loading...</div>
+    </main>
+  </div>
+
+  <script>
+    fetch('/api/chatbots').then(r=>r.json()).then(bots=>{
+      const el = document.getElementById('bot-list');
+      if(!bots.length){ el.innerHTML='<p class="muted">No chatbots yet. <a href="/chatbots/new">Create one</a></p>'; return; }
+      el.innerHTML = bots.map(b=>`
+        <div class="list-item">
+          <a href="/chatbots/${b.id}" class="list-item-link">
+            <div class="list-item-icon" style="background:${b.theme_color}20;color:${b.theme_color}">🤖</div>
+            <div class="list-item-info"><strong>${b.name}</strong><span class="muted">${b.slug} · ${b.document_count} docs</span></div>
+          </a>
+          <div class="list-item-actions">
+            <a href="/chat/${b.slug}" class="btn btn-ghost btn-sm" target="_blank">Preview</a>
+            <form action="/api/chatbots/${b.id}/delete" method="post" style="display:inline" onsubmit="return confirm('Delete this chatbot?')">
+              <button class="btn btn-danger btn-sm">Delete</button>
+            </form>
+          </div>
+        </div>`).join('');
+    });
+  </script>
+</body>
+</html>
