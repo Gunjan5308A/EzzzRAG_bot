@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard - RAG Automation</title>
+<style>
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --text: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --border: #e5e5e7;
+  --accent: #0066cc;
+  --accent-hover: #004499;
+  --error: #ea4335;
+  --success: #34a853;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --radius: 10px;
+}
+
+[data-theme="dark"] {
+  --bg: #1d1d1f;
+  --surface: #2c2c2e;
+  --text: #f5f5f7;
+  --text-secondary: #98989d;
+  --border: #3d3d3f;
+  --accent: #66aaff;
+  --accent-hover: #88bbff;
+  --shadow: 0 2px 12px rgba(0,0,0,0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background 0.2s, color 0.2s;
+}
+
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.header h1 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-right span {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.icon-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.icon-btn:hover {
+  border-color: var(--accent);
+}
+
+.logout-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.logout-btn:hover {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 700px) {
+  .container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.card h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  letter-spacing: -0.2px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: var(--text-secondary);
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.2s, background 0.2s;
+  outline: none;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--accent);
+}
+
+.form-group input[type="file"] {
+  padding: 8px;
+  font-size: 13px;
+}
+
+.form-group input[type="range"] {
+  padding: 0;
+  border: none;
+  background: none;
+  accent-color: var(--accent);
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.range-row input[type="range"] {
+  flex: 1;
+}
+
+.range-row span {
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 28px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--accent);
+  color: #ffffff;
+  transition: background 0.2s;
+}
+
+.btn:hover {
+  background: var(--accent-hover);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.msg {
+  font-size: 13px;
+  margin-top: 12px;
+  text-align: center;
+  min-height: 20px;
+}
+
+.msg.error { color: var(--error); }
+.msg.success { color: var(--success); }
+
+.chat-box {
+  margin-top: 16px;
+  min-height: 100px;
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 12px;
+  background: var(--bg);
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  transition: background 0.2s;
+}
+
+.chat-box:empty::before {
+  content: "Upload a PDF, then ask a question.";
+  color: var(--text-secondary);
+}
+
+.ask-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.ask-row input {
+  flex: 1;
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.ask-row input:focus {
+  border-color: var(--accent);
+}
+
+.ask-row button {
+  padding: 9px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background: var(--accent);
+  color: #ffffff;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.ask-row button:hover {
+  background: var(--accent-hover);
+}
+
+.ask-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>RAG Automation</h1>
+  <div class="header-right">
+    <span id="userDisplay"></span>
+    <button class="icon-btn" id="themeToggle" aria-label="Toggle theme">&#9681;</button>
+    <button class="logout-btn" id="logoutBtn">Log out</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Upload Document</h2>
+    <form id="uploadForm">
+      <div class="form-group">
+        <label for="botId">Bot ID</label>
+        <input type="text" id="botId" required>
+      </div>
+      <div class="form-group">
+        <label for="context">Context</label>
+        <textarea id="context" placeholder="Describe the document context..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="temperature">Temperature: <span id="tempVal">0.2</span></label>
+        <div class="range-row">
+          <input type="range" id="temperature" min="0" max="1" step="0.1" value="0.2">
+          <span>0.2</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="pdf">PDF File</label>
+        <input type="file" id="pdf" accept=".pdf" required>
+      </div>
+      <button type="submit" class="btn" id="uploadBtn">Upload</button>
+      <div class="msg" id="uploadMsg"></div>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>Ask a Question</h2>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="ask-row">
+      <input type="text" id="questionInput" placeholder="Type your question...">
+      <button id="askBtn">Ask</button>
+    </div>
+    <div class="msg" id="askMsg"></div>
+  </div>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeToggle = document.getElementById('themeToggle');
+const logoutBtn = document.getElementById('logoutBtn');
+const userDisplay = document.getElementById('userDisplay');
+const uploadForm = document.getElementById('uploadForm');
+const uploadBtn = document.getElementById('uploadBtn');
+const uploadMsg = document.getElementById('uploadMsg');
+const botId = document.getElementById('botId');
+const context = document.getElementById('context');
+const temperature = document.getElementById('temperature');
+const tempVal = document.getElementById('tempVal');
+const pdf = document.getElementById('pdf');
+const chatBox = document.getElementById('chatBox');
+const questionInput = document.getElementById('questionInput');
+const askBtn = document.getElementById('askBtn');
+const askMsg = document.getElementById('askMsg');
+
+const username = localStorage.getItem('username');
+if (!username) window.location.href = '/';
+userDisplay.textContent = username;
+
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) html.setAttribute('data-theme', savedTheme);
+themeToggle.textContent = html.getAttribute('data-theme') === 'dark' ? '\u2600' : '\u263E';
+
+themeToggle.addEventListener('click', () => {
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeToggle.textContent = next === 'dark' ? '\u2600' : '\u263E';
+});
+
+logoutBtn.addEventListener('click', () => {
+  localStorage.removeItem('username');
+  window.location.href = '/';
+});
+
+temperature.addEventListener('input', () => {
+  tempVal.textContent = parseFloat(temperature.value).toFixed(1);
+});
+
+uploadForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  uploadMsg.textContent = '';
+  uploadMsg.className = 'msg';
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = 'Uploading...';
+
+  const formData = new FormData();
+  formData.append('temp', temperature.value);
+  formData.append('context', context.value.trim());
+  formData.append('id', botId.value.trim());
+  formData.append('username', username);
+  formData.append('pdf', pdf.files[0]);
+
+  try {
+    const res = await fetch('/add_chunks', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (res.ok) {
+      uploadMsg.className = 'msg success';
+      uploadMsg.textContent = 'Document uploaded and processed.';
+    } else {
+      uploadMsg.className = 'msg error';
+      uploadMsg.textContent = data.detail || 'Upload failed.';
+    }
+  } catch {
+    uploadMsg.className = 'msg error';
+    uploadMsg.textContent = 'Connection error.';
+  } finally {
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = 'Upload';
+  }
+});
+
+askBtn.addEventListener('click', async () => {
+  const question = questionInput.value.trim();
+  const id = botId.value.trim();
+  if (!question) return;
+  if (!id) {
+    askMsg.className = 'msg error';
+    askMsg.textContent = 'Enter a Bot ID first.';
+    return;
+  }
+
+  askMsg.textContent = '';
+  askMsg.className = 'msg';
+  askBtn.disabled = true;
+  const userQ = question;
+  questionInput.value = '';
+
+  chatBox.textContent += 'You: ' + userQ + '\n';
+  chatBox.textContent += 'Thinking...\n';
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  try {
+    const res = await fetch(`/ask_question?question=${encodeURIComponent(userQ)}&bot_id=${encodeURIComponent(id)}`);
+    const data = await res.json();
+    const lines = chatBox.textContent.split('\n');
+    lines.pop();
+    chatBox.textContent = lines.join('\n') + (lines.length ? '\n' : '');
+    chatBox.textContent += 'Answer: ' + (data.answer || 'No answer') + '\n\n';
+    chatBox.scrollTop = chatBox.scrollHeight;
+  } catch {
+    const lines = chatBox.textContent.split('\n');
+    lines.pop();
+    chatBox.textContent = lines.join('\n') + '\nError: Connection failed.\n';
+  } finally {
+    askBtn.disabled = false;
+  }
+});
+
+questionInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') askBtn.click();
+});
+</script>
+</body>
+</html>

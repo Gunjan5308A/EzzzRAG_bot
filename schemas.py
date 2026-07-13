@@ -1,12 +1,10 @@
 from pydantic import BaseModel
-from fastapi import UploadedFile, File
 
-class retrivalItem(BaseModel):
-    temp: int = 0.2
+class RetrievalItem(BaseModel):
+    temp: float = 0.2
     context: str
     id: str
-    user: str
-    pdf: UploadedFile = File(...)
+    username: str
 
 class User(BaseModel):
     username: str

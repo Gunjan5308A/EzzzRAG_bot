@@ -1,19 +1,20 @@
-from sqlalchemy import create_engine, table, Column, Integer, String, MetaData
+from sqlalchemy import Table, Column, Integer, String
+from db import metadata
 
-users = table(
+users = Table(
     "users",
-    MetaData(),
+    metadata,
     Column("id", Integer, primary_key=True),
     Column("username", String, unique=True, nullable=False),
     Column("password", String, nullable=False),
 )
 
-bots = table(
+bots = Table(
     "bot",
-    MetaData(),
+    metadata,
     Column("bot_id", Integer, primary_key=True),
     Column("username", String, unique=False, nullable=False),
     Column("context", String),
-    Column("temprature", Integer)
+    Column("temperature", Integer)
 )
 

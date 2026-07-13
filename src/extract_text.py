@@ -15,7 +15,8 @@ def extract_text_from_pdf(pdf):
     for page in pdf:
         page_img = page.get_pixmap(matrix=matrix, colorspace="GRAY")  # Render page to an image
         page_img = page_img.tobytes("ppm")  # Convert to bytes
-        text += reader.readtext(page_img)
+        results = reader.readtext(page_img)
+        text += " ".join(r[1] for r in results)
     return text
 
 
