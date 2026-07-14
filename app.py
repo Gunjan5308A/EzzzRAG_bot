@@ -1,8 +1,8 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, Depends
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Depends
 from fastapi.responses import HTMLResponse
 from src.rag import add_chunks, ask_question
 from src.extract_text import extract_text_from_pdf, chunking_text
-from schemas import RetrievalItem, User
+from schemas import User
 from models import users, bots
 from db import DATABASE, metadata, engine
 import bcrypt
@@ -65,30 +65,31 @@ async def login_user(user: User):
     
     return {"message": "Login successful."}
 
-# FIX: Unpacked the Pydantic metadata schema from the incoming file object using Depends()
 @app.post("/add_chunks")
 async def add_chunks_endpoint(
-    bot: RetrievalItem = Depends(), # Changes payload from rigid JSON to form inputs
-    pdf: UploadFile = File(...)     # Extracted the PDF completely as its own field
+    temp: float = Form(...),
+    context: str = Form(...),
+    id: str = Form(...),
+    username: str = Form(...),
+    pdf: UploadFile = File(...),
 ):
     if pdf.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Only PDFs are allowed.")
     
-    # Save the Bot Configuration to your SQL Database
+    bot_id = int(id)
+
     query = bots.insert().values(
-        username=bot.username, 
-        bot_id=bot.id, 
-        temperature=int(bot.temp), # Adjusted column name to match schema standard
-        context=bot.context
+        username=username,
+        bot_id=bot_id,
+        temperature=int(temp),
+        context=context,
     )
     await DATABASE.execute(query)
 
-    # Process file dynamically directly in memory
     pdf_bytes = await pdf.read()
     text = extract_text_from_pdf(pdf_bytes)
-
     chunks = chunking_text(text)
-    add_chunks(chunks, bot_id=bot.id)
+    add_chunks(chunks, bot_id=bot_id)
     
     return {"status": "Chunks added successfully"}
 

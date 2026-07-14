@@ -4,18 +4,18 @@ from langchain_chroma import Chroma
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from config import CHROMA_API_KEY
+from config import CHROMA_API_KEY, DB_NAME, TENANT
 from src.model import default_embeddings, default_llm, create_llm
 
-IS_TESTING = True 
+IS_TESTING = False
 
 if IS_TESTING:
     chroma_client = chromadb.EphemeralClient()
 else:
     chroma_client = chromadb.CloudClient(
         api_key=os.getenv("CHROMA_API_KEY"),
-        tenant="default",
-        database="default"
+        tenant=TENANT,
+        database=DB_NAME
     )
 
 vector_store = Chroma(

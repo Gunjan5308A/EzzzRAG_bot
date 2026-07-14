@@ -21,7 +21,8 @@ EMBEDDING_MODEL: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 
 # Chroma / Vector Store
 CHROMA_API_KEY: str = os.getenv("CHROMA_API_KEY", "")
-CHROMA_URL: str = os.getenv("CHROMA_URL", "http://localhost:8000")
+TENANT: str = os.getenv("CHROMA_TENANT")
+DB_NAME: str = os.getenv("CHROMA_DATABASE")
 
 # Database
 DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./rag.db")
